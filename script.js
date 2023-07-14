@@ -7,11 +7,13 @@ btn.addEventListener('click',()=>{
     tweetInput.value=""
 })
 
+//have main feed
 function feedHTML(){
 
     let bodyHtml =""
     tweetsData.forEach(tweet => {
        
+        //color the icon it clicked
         let likeIconClass
         let retweetIconClass
         if(tweet.isLiked){
@@ -47,6 +49,7 @@ function feedHTML(){
     return bodyHtml
 }
 
+//like/dislike the like icon and  increase/decreases like
 function renderLike(data){  
     let tweetObject = tweetsData.filter(ele=>data==ele.uuid)[0]
     if(tweetObject.isLiked){
@@ -57,6 +60,7 @@ function renderLike(data){
     tweetObject.isLiked = !tweetObject.isLiked
     render()
 }
+//like/dislike the retweet icon and increase/decreases retweet
 function renderRetweet(data){  
     let tweetObject = tweetsData.filter(ele=>data==ele.uuid)[0]
     if(tweetObject.isRetweeted){
@@ -78,8 +82,10 @@ document.addEventListener('click',(e)=>{
     }
 });
 
+
 const feed = document.getElementById('feed');
 function render(){
     feed.innerHTML = feedHTML();
 }
+//calling main function
 render()
