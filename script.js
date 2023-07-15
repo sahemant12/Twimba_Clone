@@ -1,11 +1,6 @@
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid'; //for universal random uuid
 import tweetsData from './data.js'
 const tweetInput = document.getElementById('tweet-input')
-const btn = document.getElementById('tweet-btn')
-
-btn.addEventListener('click',()=>{
-    console.log(tweetInput.value)
-    tweetInput.value=""
-})
 
 //have main feed
 function feedHTML(){
@@ -21,6 +16,23 @@ function feedHTML(){
         }
         if(tweet.isRetweeted){
             retweetIconClass='retweeted'
+        }
+
+        //added later
+        let repliesHtml=''
+        if(tweet.replies.length>0){
+            tweet.replies.forEach((rpy)=>{
+                repliesHtml += `
+                <div class="tweet-reply">
+                <div class="tweet-inner">
+                    <img src="${rpy.profilePic}" class="profile-pic">
+                        <div>
+                            <p class="handle">${rpy.handle}</p>
+                            <p class="tweet-text">${rpy.tweetText}</p>
+                        </div>
+                    </div>
+            </div>   `
+            })
         }
 
         bodyHtml +=`
@@ -40,10 +52,11 @@ function feedHTML(){
                         <span class="tweet-detail "><i class="fa-solid fa-retweet ${retweetIconClass}" data-retweet=${tweet.uuid}></i>
                             ${tweet.retweets}
                         </span>
-                    </div>   
-                </div>            
-        </div>`
-
+                        </div> 
+                        <div class="hidden" id="replies-${tweet.uuid}">${repliesHtml}</div> 
+                        </div>          
+                   
+                </div>`
     });
 
     return bodyHtml
@@ -71,6 +84,10 @@ function renderRetweet(data){
     tweetObject.isRetweeted = !tweetObject.isRetweeted
     render()
 }
+//like/dislike the retweet icon and increase/decreases retweet
+function renderReply(data){  
+    document.getElementById(`replies-${data}`).classList.toggle('hidden')
+}
 
 document.addEventListener('click',(e)=>{
     if(e.target.dataset.like){
@@ -78,7 +95,9 @@ document.addEventListener('click',(e)=>{
     }else if(e.target.dataset.retweet){
         renderRetweet(e.target.dataset.retweet)
     }else if(e.target.dataset.reply){
-        renderLike(e.target.dataset.reply)
+        renderReply(e.target.dataset.reply)
+    }else if(e.target.id=='tweet-btn'){
+        addTweet()
     }
 });
 
@@ -89,3 +108,22 @@ function render(){
 }
 //calling main function
 render()
+
+function addTweet(){
+    const tweetData = {
+        handle: `@hemantsah2912 💎`,
+        profilePic:`./images/scrimbalogo.png`,
+        likes: 0,
+        retweets: 0,
+        tweetText: tweetInput.value,
+        replies: [],
+        isLiked: false,
+        isRetweeted: false,
+        uuid: uuidv4(),
+    }
+    if(tweetInput.value){
+        tweetsData.unshift(tweetData)
+    }
+    tweetInput.value=''   
+    render()
+}
